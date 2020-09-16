@@ -1,0 +1,13 @@
+{
+  "surfReport": {
+    "spots": ["https://www.surf-report.com/meteo-surf/kerhilio-s1168.html"],
+    "minStars": 2
+  },
+  "sms": {
+    "user": 123456,
+    "pass": "blublublu"
+  },
+  "cron": {
+    "refreshInterval": "0 7,10,12,17,22 * * *"
+  }
+}
