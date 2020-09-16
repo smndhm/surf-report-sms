@@ -7,7 +7,7 @@ Get SMS notifications when good surf conditions are comming 🤙📱
 
 `git clone git@github.com:smndhm/surf-report-sms.git && cd surf-report-sms && npm ci`
 
-### Configure `conf.js`
+### Configure `conf.json`
 
 #### Free Mobile SMS API
 
