@@ -8,35 +8,43 @@ const {
   cron: { refreshInterval },
 } = require("./conf");
 
-const cronJob = new CronJob(refreshInterval, async () => {
-  try {
-    // Getting Surf Report
-    const forecast = await surfReport(confReport.spots, confReport.minStars);
+const cronJob = new CronJob(
+  refreshInterval,
+  async () => {
+    try {
+      // Getting Surf Report
+      const forecast = await surfReport(confReport.spots, confReport.minStars);
 
-    // Build SMS text (one SMS per spot)
-    for (const { title, days } of forecast) {
-      let msg = `${title}\n`;
-      for (const { title, hours } of days) {
-        msg += `\n${title}\n`;
-        for (const { hour, stars } of hours) {
-          msg += `${hour} ${"⭐".repeat(stars)}\n`;
+      // Build SMS text (one SMS per spot)
+      for (const { title, days } of forecast) {
+        let msg = `${title}\n`;
+        for (const { title, hours } of days) {
+          msg += `\n${title}\n`;
+          for (const { hour, stars } of hours) {
+            // msg += `${hour} ${"⭐".repeat(stars)}\n`; // Free Mobile smsapi does not support emoji anymore...
+            msg += `${hour} ${stars} étoiles\n`;
+          }
         }
+        // Send SMS
+        await axios({
+          method: "POST",
+          url: "https://smsapi.free-mobile.fr/sendmsg",
+          params: {
+            user: confSms.user,
+            pass: confSms.pass,
+            msg,
+          },
+        });
       }
-
-      // Send SMS
-      await axios({
-        method: "get",
-        url: "https://smsapi.free-mobile.fr/sendmsg",
-        params: {
-          user: confSms.user,
-          pass: confSms.pass,
-          msg,
-        },
-      });
+    } catch (err) {
+      throw new Error(err);
     }
-  } catch (err) {
-    console.error(err);
-  }
-});
+  },
+  null,
+  true,
+  "Europe/Paris",
+  this,
+  true
+);
 
 cronJob.start();
