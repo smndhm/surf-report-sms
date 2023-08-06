@@ -1,12 +1,12 @@
-const axios = require("axios");
-const { CronJob } = require("cron");
+const axios = require('axios');
+const { CronJob } = require('cron');
 
-const { surfReport } = require("./surf-report");
+const { surfReport } = require('./surf-report');
 const {
   surfReport: confReport,
   sms: confSms,
   cron: { refreshInterval },
-} = require("./conf");
+} = require('./conf');
 
 const cronJob = new CronJob(
   refreshInterval,
@@ -21,14 +21,13 @@ const cronJob = new CronJob(
         for (const { title, hours } of days) {
           msg += `\n${title}\n`;
           for (const { hour, stars } of hours) {
-            // msg += `${hour} ${"⭐".repeat(stars)}\n`; // Free Mobile smsapi does not support emoji anymore...
-            msg += `${hour} ${stars} étoiles\n`;
+            msg += `${hour} ${'⭐'.repeat(stars)}\n`;
           }
         }
         // Send SMS
         await axios({
-          method: "POST",
-          url: "https://smsapi.free-mobile.fr/sendmsg",
+          method: 'POST',
+          url: 'https://smsapi.free-mobile.fr/sendmsg',
           params: {
             user: confSms.user,
             pass: confSms.pass,
@@ -42,9 +41,9 @@ const cronJob = new CronJob(
   },
   null,
   true,
-  "Europe/Paris",
+  'Europe/Paris',
   this,
-  true
+  true,
 );
 
 cronJob.start();
