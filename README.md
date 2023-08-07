@@ -1,5 +1,6 @@
 # surf-report-sms
-Get SMS notifications when good surf conditions are comming 🤙📱 
+
+Get SMS notifications when good surf conditions are comming 🤙📱
 
 ## Install
 
@@ -24,4 +25,4 @@ For [Free Mobile](http://mobile.free.fr/) customers, `user` and `pass` will be a
 
 ## Run
 
-`npm run start`
+`pnpm run start`
