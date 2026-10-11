@@ -1,12 +1,14 @@
 const puppeteer = require('puppeteer');
 
 exports.surfReport = async (spots = [], nbMinStars = 0) => {
+  let forecast = [];
+
+  // launch browser
+  const browser = await puppeteer.launch();
+
+  // An error is the run's to report: swallowing it here would read as a day
+  // without waves. The browser is closed either way, or the job never ends.
   try {
-    let forecast = [];
-
-    // launch browser
-    const browser = await puppeteer.launch({ headless: 'new' });
-
     // scan spots
     for (const spot of spots) {
       // new page
@@ -53,9 +55,9 @@ exports.surfReport = async (spots = [], nbMinStars = 0) => {
                     period: swells[1].textContent.trim(),
                     direction: swells[2].querySelectorAll('img').length
                       ? swells[2]
-                          .querySelector('img')
-                          .getAttribute('alt')
-                          .trim()
+                        .querySelector('img')
+                        .getAttribute('alt')
+                        .trim()
                       : '',
                   };
                 },
@@ -68,9 +70,9 @@ exports.surfReport = async (spots = [], nbMinStars = 0) => {
                     period: swells[1].textContent.trim(),
                     direction: swells[2].querySelectorAll('img').length
                       ? swells[2]
-                          .querySelector('img')
-                          .getAttribute('alt')
-                          .trim()
+                        .querySelector('img')
+                        .getAttribute('alt')
+                        .trim()
                       : '',
                   };
                 },
@@ -107,10 +109,8 @@ exports.surfReport = async (spots = [], nbMinStars = 0) => {
       await page.close();
     }
 
-    await browser.close();
-
     return forecast;
-  } catch (err) {
-    console.error(err);
+  } finally {
+    await browser.close();
   }
 };
