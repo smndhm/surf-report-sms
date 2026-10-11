@@ -11,7 +11,7 @@ The script runs on GitHub Actions. There is nothing to install. The setup is in 
 A cron is one file in `.github/workflows`, named after it, holding everything about it: when it runs, which spots it reads, and from how many stars it sends an SMS.
 
 ```yaml
-name: Cron kerhilio
+name: Cron surf-report
 
 on:
   schedule:
@@ -24,23 +24,26 @@ concurrency:
 
 jobs:
   run:
-    uses: ./.github/workflows/surf-report.yml
+    uses: ./.github/workflows/crons.yml
     with:
-      cron: kerhilio
+      cron: surf-report
       arguments: |
         {
-          "spots": ["https://www.surf-report.com/meteo-surf/kerhilio-s1168.html"],
+          "spots": [
+            "https://www.surf-report.com/meteo-surf/kerhilio-s1168.html",
+            "https://www.surf-report.com/meteo-surf/another-spot-s0000.html"
+          ],
           "minStars": 2
         }
     secrets: inherit
 ```
 
 - `cron` names it in the logs.
-- `spots` is an array of the https://www.surf-report.com pages you want to get notified from.
+- `spots` is an array of the https://www.surf-report.com pages you want to get notified from. Adding a beach means adding its URL to the array: each spot with a good enough session gets its own SMS.
 - `minStars` is the minimum of stars you want to get notified for, from 0 to 5.
 - `schedule` is when it runs, as a cron expression in UTC, see https://crontab.guru/.
 
-`surf-report.yml` holds the steps every cron shares and never runs on its own. Adding a cron means adding one such file, and nothing else. Each one then has its own name in the Actions tab, its own green or red history, and its own button to run it by hand.
+`crons.yml` holds the steps every cron shares and never runs on its own. One cron is enough for any number of spots. Another one is only worth it for spots that need a different schedule or minimum of stars: it means adding one such file, and nothing else. Each one then has its own name in the Actions tab, its own green or red history, and its own button to run it by hand.
 
 Everything is validated before the browser starts: a missing or malformed field fails the run immediately.
 
@@ -57,7 +60,7 @@ The workflows run on their own once the secrets are set. `Run workflow` on the A
 `pnpm cron:once` is the command they run. It reads the cron from `CRON_NAME` and `CRON_ARGUMENTS`, and the credentials from `FREE_MOBILE_USER` and `FREE_MOBILE_PASS`:
 
 ```sh
-CRON_NAME=kerhilio \
+CRON_NAME=surf-report \
 CRON_ARGUMENTS='{"spots":["https://www.surf-report.com/meteo-surf/kerhilio-s1168.html"],"minStars":2}' \
 FREE_MOBILE_USER=12345678 FREE_MOBILE_PASS=... \
 pnpm cron:once
@@ -68,9 +71,10 @@ The other scripts are `pnpm test` and `pnpm lint`, which the `Tests` workflow ru
 Each run also writes a summary on its page in the Actions tab, above the log:
 
 ```
-## kerhilio
+## surf-report
 
-- SMS sent for Kerhilio: 3 hours over 2 days
+- SMS sent for Météo surf Kerhilio - Météo Kerhilio et prévisions surf: 3 hours over 2 days
+- SMS sent for Météo surf Another Spot - Météo Another Spot et prévisions surf: 1 hour over 1 day
 ```
 
 ### Good to know
