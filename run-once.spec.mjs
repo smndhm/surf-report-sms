@@ -4,7 +4,10 @@ import { join } from 'path';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { runOnce } from './run-once.js';
 
-const SPOT = 'https://www.surf-report.com/meteo-surf/kerhilio-s1168.html';
+const SPOTS = [
+  'https://www.surf-report.com/meteo-surf/kerhilio-s1168.html',
+  'https://www.surf-report.com/meteo-surf/another-spot-s0000.html',
+];
 
 const FORECAST = [
   { title: 'Kerhilio', days: [{ title: 'Samedi 11', hours: [{ hour: '09h', stars: 3 }, { hour: '12h', stars: 2 }] }] },
@@ -13,8 +16,8 @@ const FORECAST = [
 
 let summary;
 const env = () => ({
-  CRON_NAME: 'kerhilio',
-  CRON_ARGUMENTS: JSON.stringify({ spots: [SPOT], minStars: 2 }),
+  CRON_NAME: 'surf-report',
+  CRON_ARGUMENTS: JSON.stringify({ spots: SPOTS, minStars: 2 }),
   FREE_MOBILE_USER: '12345678',
   FREE_MOBILE_PASS: 'secret-pass',
   GITHUB_STEP_SUMMARY: summary,
@@ -32,11 +35,11 @@ describe('runOnce', () => {
     const send = vi.fn().mockResolvedValue();
 
     expect(await runOnce(env(), { scrape, send })).toBe(0);
-    expect(scrape).toHaveBeenCalledWith([SPOT], 2);
+    expect(scrape).toHaveBeenCalledWith(SPOTS, 2);
     expect(send).toHaveBeenCalledTimes(2);
     expect(send).toHaveBeenCalledWith({ user: '12345678', pass: 'secret-pass' }, 'Kerhilio\n\nSamedi 11\n09h ⭐⭐⭐\n12h ⭐⭐\n');
     expect(readFileSync(summary, 'utf8')).toBe([
-      '## kerhilio',
+      '## surf-report',
       '',
       '- SMS sent for Kerhilio: 2 hours over 1 day',
       '- SMS sent for Guidel: 1 hour over 1 day',
@@ -49,7 +52,7 @@ describe('runOnce', () => {
 
     expect(await runOnce(env(), { scrape: vi.fn().mockResolvedValue([]), send })).toBe(0);
     expect(send).not.toHaveBeenCalled();
-    expect(readFileSync(summary, 'utf8')).toBe('## kerhilio\n\nNo session of 2 stars or more.\n');
+    expect(readFileSync(summary, 'utf8')).toBe('## surf-report\n\nNo session of 2 stars or more.\n');
   });
 
   it('keeps sending after a failed SMS, and counts it', async () => {

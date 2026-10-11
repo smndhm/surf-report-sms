@@ -1,4 +1,4 @@
-name: Cron kerhilio
+name: Cron surf-report
 
 on:
   # In UTC: 7:37, 10:37, 12:37, 17:37 and 22:37 in Paris in summer, an hour
@@ -14,12 +14,15 @@ concurrency:
 
 jobs:
   run:
-    uses: ./.github/workflows/surf-report.yml
+    uses: ./.github/workflows/crons.yml
     with:
-      cron: kerhilio
+      cron: surf-report
+      # One SMS per spot with a good enough session. A spot is one more line.
       arguments: |
         {
-          "spots": ["https://www.surf-report.com/meteo-surf/kerhilio-s1168.html"],
+          "spots": [
+            "https://www.surf-report.com/meteo-surf/kerhilio-s1168.html"
+          ],
           "minStars": 2
         }
     secrets: inherit
