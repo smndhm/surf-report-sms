@@ -1,5 +1,3 @@
-const axios = require('axios');
-
 const API_URL = 'https://smsapi.free-mobile.fr/sendmsg';
 
 // What the Free Mobile API means by each status it answers
@@ -22,20 +20,23 @@ const buildMessage = ({ title, days }) => {
   return msg;
 };
 
-// The credentials travel in the query string, so the axios error, which keeps
-// the request, is never rethrown: only its status is.
-const sendSms = async ({ user, pass }, msg, request = axios) => {
+// The credentials travel in the query string, so a failure is described by its
+// status alone, never by the request or the error that carries it.
+const sendSms = async ({ user, pass }, msg, request = fetch) => {
+  const url = new URL(API_URL);
+  url.searchParams.set('user', user);
+  url.searchParams.set('pass', pass);
+  url.searchParams.set('msg', msg);
+
+  let response;
   try {
-    await request({
-      method: 'POST',
-      url: API_URL,
-      params: { user, pass, msg },
-    });
-  } catch (err) {
-    const status = err.response?.status;
-    const reason = STATUSES[status] ?? (status ? 'unexpected answer' : 'no answer');
-    // eslint-disable-next-line preserve-caught-error -- the cause holds the credentials
-    throw new Error(`SMS not sent${status ? ` (HTTP ${status})` : ''}: ${reason}.`);
+    response = await request(url, { method: 'POST' });
+  } catch {
+    throw new Error('SMS not sent: no answer.');
+  }
+  if (!response.ok) {
+    const reason = STATUSES[response.status] ?? 'unexpected answer';
+    throw new Error(`SMS not sent (HTTP ${response.status}): ${reason}.`);
   }
 };
 
