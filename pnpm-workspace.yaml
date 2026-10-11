@@ -1,0 +1,4 @@
+# pnpm 12 only runs the install scripts it is allowed to. puppeteer's is the one
+# that downloads the Chrome it drives.
+allowBuilds:
+  puppeteer: true
