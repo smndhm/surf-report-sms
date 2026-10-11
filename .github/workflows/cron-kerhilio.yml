@@ -1,0 +1,25 @@
+name: Cron kerhilio
+
+on:
+  # In UTC: 7:37, 10:37, 12:37, 17:37 and 22:37 in Paris in summer, an hour
+  # earlier in winter. In the second half of the hour, where GitHub's scheduler
+  # is the least loaded. See the README.
+  schedule:
+    - cron: '37 5,8,10,15,20 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: surf-report
+  cancel-in-progress: false
+
+jobs:
+  run:
+    uses: ./.github/workflows/surf-report.yml
+    with:
+      cron: kerhilio
+      arguments: |
+        {
+          "spots": ["https://www.surf-report.com/meteo-surf/kerhilio-s1168.html"],
+          "minStars": 2
+        }
+    secrets: inherit
