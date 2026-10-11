@@ -1,16 +1,23 @@
 {
-  "name": "surf-report",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "surf-report-sms",
+  "version": "2.0.0",
+  "description": "Get SMS notifications when good surf conditions are coming",
+  "packageManager": "pnpm@12.11.2",
   "scripts": {
-    "start": "node ./index.js"
+    "cron:once": "node ./run-once.js",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
-  "author": "",
+  "author": "smndhm",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.4.0",
-    "cron": "^2.4.0",
-    "puppeteer": "^21.0.1"
+    "puppeteer": "25.13.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.12.0",
+    "globals": "17.13.0",
+    "vitest": "5.0.3"
   }
 }
