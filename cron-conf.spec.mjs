@@ -4,7 +4,7 @@ import { loadCron } from './cron-conf.js';
 const SPOT = 'https://www.surf-report.com/meteo-surf/kerhilio-s1168.html';
 
 const env = (overrides = {}) => ({
-  CRON_NAME: 'kerhilio',
+  CRON_NAME: 'surf-report',
   CRON_ARGUMENTS: JSON.stringify({ spots: [SPOT], minStars: 2 }),
   FREE_MOBILE_USER: '12345678',
   FREE_MOBILE_PASS: 'secret-pass',
@@ -14,11 +14,16 @@ const env = (overrides = {}) => ({
 describe('loadCron', () => {
   it('reads the cron and the credentials', () => {
     expect(loadCron(env())).toEqual({
-      name: 'kerhilio',
+      name: 'surf-report',
       spots: [SPOT],
       minStars: 2,
       sms: { user: '12345678', pass: 'secret-pass' },
     });
+  });
+
+  it('reads every spot', () => {
+    const spots = [SPOT, 'https://www.surf-report.com/meteo-surf/another-spot-s0000.html'];
+    expect(loadCron(env({ CRON_ARGUMENTS: JSON.stringify({ spots, minStars: 2 }) })).spots).toEqual(spots);
   });
 
   it('needs a name', () => {
