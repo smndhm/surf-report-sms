@@ -10,8 +10,8 @@ const SPOTS = [
 ];
 
 const FORECAST = [
-  { title: 'Kerhilio', days: [{ title: 'Samedi 11', hours: [{ hour: '09h', stars: 3 }, { hour: '12h', stars: 2 }] }] },
-  { title: 'Guidel', days: [{ title: 'Samedi 11', hours: [{ hour: '18h', stars: 2 }] }] },
+  { url: SPOTS[0], title: 'Kerhilio', days: [{ title: 'Samedi 11', hours: [{ hour: '09h', stars: 3 }, { hour: '12h', stars: 2 }] }] },
+  { url: SPOTS[1], title: 'Guidel', days: [{ title: 'Samedi 11', hours: [{ hour: '18h', stars: 2 }] }] },
 ];
 
 let summary;
@@ -50,7 +50,9 @@ describe('runOnce', () => {
   it('sends nothing when no session is good enough', async () => {
     const send = vi.fn();
 
-    expect(await runOnce(env(), { scrape: vi.fn().mockResolvedValue([]), send })).toBe(0);
+    const scrape = vi.fn().mockResolvedValue(FORECAST.map((spot) => ({ ...spot, days: [] })));
+
+    expect(await runOnce(env(), { scrape, send })).toBe(0);
     expect(send).not.toHaveBeenCalled();
     expect(readFileSync(summary, 'utf8')).toBe('## surf-report\n\nNo session of 2 stars or more.\n');
   });
@@ -62,7 +64,25 @@ describe('runOnce', () => {
 
     expect(await runOnce(env(), { scrape: vi.fn().mockResolvedValue(FORECAST), send })).toBe(1);
     expect(send).toHaveBeenCalledTimes(2);
-    expect(readFileSync(summary, 'utf8')).toContain('- **SMS not sent for Kerhilio**: SMS not sent (HTTP 402)');
+    expect(readFileSync(summary, 'utf8')).toContain('- **Kerhilio**: SMS not sent (HTTP 402)');
+  });
+
+  it('sends the other spots when one could not be read, and counts it', async () => {
+    const scrape = vi.fn().mockResolvedValue([
+      { url: SPOTS[0], error: new Error('No forecast on the page, has the site changed?') },
+      FORECAST[1],
+    ]);
+    const send = vi.fn().mockResolvedValue();
+
+    expect(await runOnce(env(), { scrape, send })).toBe(1);
+    expect(send).toHaveBeenCalledTimes(1);
+    expect(readFileSync(summary, 'utf8')).toBe([
+      '## surf-report',
+      '',
+      '- SMS sent for Guidel: 1 hour over 1 day',
+      `- **${SPOTS[0]}**: not read: No forecast on the page, has the site changed?`,
+      '',
+    ].join('\n'));
   });
 
   it('checks the cron before starting the browser', async () => {

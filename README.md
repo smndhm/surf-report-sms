@@ -84,3 +84,5 @@ Each run also writes a summary on its page in the Actions tab, above the log:
 - A scheduled workflow is automatically disabled after 60 days without activity in the repository.
 - Each run sends one SMS per spot with a session of `minStars` or more, and nothing otherwise, so the same session can be announced by several runs.
 - The job turns red when an SMS cannot be sent, so wrong credentials do not fail silently day after day.
+- It turns red too when a spot page cannot be read, or holds no forecast: that is what a change of the site looks like, and taking it for calm seas would mean no SMS ever again. The other spots are still read and sent.
+- Only the time and stars of each hour are read, since that is all the SMS says: the rest of the page can change without breaking anything.
