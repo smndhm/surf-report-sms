@@ -15,8 +15,8 @@ const renderSummary = (name, minStars, sent, errors) => {
     const hours = days.reduce((total, day) => total + day.hours.length, 0);
     lines.push(`- SMS sent for ${title}: ${hours} hour${hours === 1 ? '' : 's'} over ${days.length} day${days.length === 1 ? '' : 's'}`);
   });
-  errors.forEach(({ title, message }) => {
-    lines.push(`- **SMS not sent for ${title}**: ${message}`);
+  errors.forEach(({ spot, message }) => {
+    lines.push(`- **${spot}**: ${message}`);
   });
 
   return `${lines.join('\n')}\n`;
@@ -29,9 +29,9 @@ const writeSummary = (summary, env) => {
   }
 };
 
-// Runs the cron the workflow defined, then returns the number of SMS that
-// could not be sent so the caller can exit accordingly. A spot that fails to
-// send does not keep the others from being sent.
+// Runs the cron the workflow defined, then returns the number of spots that
+// could not be read or sent so the caller can exit accordingly. A spot that
+// fails does not keep the others from being read and sent.
 const runOnce = async (
   env = process.env,
   { scrape = surfReport, send = sendSms } = {},
@@ -39,18 +39,30 @@ const runOnce = async (
   const cron = loadCron(env);
   console.log(`Cron ${cron.name} started, ${cron.spots.length} spot(s), ${cron.minStars} stars or more`);
 
-  const forecast = await scrape(cron.spots, cron.minStars);
+  const results = await scrape(cron.spots, cron.minStars);
 
   const sent = [];
   const errors = [];
-  for (const spot of forecast) {
+  const fail = (spot, message) => {
+    errors.push({ spot, message });
+    console.error(`${spot}: ${message}`);
+  };
+
+  for (const result of results) {
+    if (result.error) {
+      fail(result.url, `not read: ${result.error.message}`);
+      continue;
+    }
+    if (result.days.length === 0) {
+      console.log(`Nothing for ${result.title}`);
+      continue;
+    }
     try {
-      await send(cron.sms, buildMessage(spot));
-      sent.push(spot);
-      console.log(`SMS sent for ${spot.title}`);
+      await send(cron.sms, buildMessage(result));
+      sent.push(result);
+      console.log(`SMS sent for ${result.title}`);
     } catch (err) {
-      errors.push({ title: spot.title, message: err.message });
-      console.error(`SMS not sent for ${spot.title}: ${err.message}`);
+      fail(result.title, err.message);
     }
   }
 
