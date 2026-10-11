@@ -17,21 +17,17 @@ describe('buildMessage', () => {
 
 describe('sendSms', () => {
   it('posts the message to Free Mobile', async () => {
-    const request = vi.fn().mockResolvedValue({ status: 200 });
-    await sendSms(SMS, 'Hello', request);
-    expect(request).toHaveBeenCalledWith({
-      method: 'POST',
-      url: 'https://smsapi.free-mobile.fr/sendmsg',
-      params: { user: '12345678', pass: 'secret-pass', msg: 'Hello' },
-    });
+    const request = vi.fn().mockResolvedValue(new Response(null, { status: 200 }));
+    await sendSms(SMS, 'Hello ⭐ & co', request);
+    expect(request).toHaveBeenCalledTimes(1);
+    const [url, init] = request.mock.calls[0];
+    expect(init).toEqual({ method: 'POST' });
+    expect(url.origin + url.pathname).toBe('https://smsapi.free-mobile.fr/sendmsg');
+    expect(Object.fromEntries(url.searchParams)).toEqual({ user: '12345678', pass: 'secret-pass', msg: 'Hello ⭐ & co' });
   });
 
   it('says what the status means, without the credentials', async () => {
-    const error = Object.assign(new Error('Request failed'), {
-      response: { status: 403 },
-      config: { params: SMS },
-    });
-    const request = vi.fn().mockRejectedValue(error);
+    const request = vi.fn().mockResolvedValue(new Response(null, { status: 403 }));
     const sent = sendSms(SMS, 'Hello', request);
     await expect(sent).rejects.toThrow('SMS not sent (HTTP 403): the service is not activated');
     await sent.catch((err) => {
@@ -41,7 +37,9 @@ describe('sendSms', () => {
   });
 
   it('says when nothing answered', async () => {
-    const request = vi.fn().mockRejectedValue(new Error('getaddrinfo ENOTFOUND'));
-    await expect(sendSms(SMS, 'Hello', request)).rejects.toThrow('SMS not sent: no answer.');
+    const request = vi.fn().mockRejectedValue(new TypeError('fetch failed', { cause: SMS }));
+    const sent = sendSms(SMS, 'Hello', request);
+    await expect(sent).rejects.toThrow('SMS not sent: no answer.');
+    await sent.catch((err) => expect(err.cause).toBeUndefined());
   });
 });
