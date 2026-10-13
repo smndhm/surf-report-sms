@@ -1,5 +1,5 @@
 # Steps shared by every cron, never run on its own
-name: Surf report cron
+name: Shared steps (not a cron)
 
 on:
   workflow_call:
