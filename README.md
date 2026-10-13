@@ -57,6 +57,8 @@ They are repository secrets, `FREE_MOBILE_USER` and `FREE_MOBILE_PASS`, added un
 
 The workflows run on their own once the secrets are set. `Run workflow` on the Actions tab runs a cron by hand, outside of its schedule.
 
+To pause a cron, for the winter say, disable it on the Actions tab: the cron, `Cron surf-report`, then `⋯` > `Disable workflow`, and `Enable workflow` to bring it back. `Shared steps (not a cron)` never runs on its own, so disabling it stops nothing.
+
 `pnpm cron:once` is the command they run. It reads the cron from `CRON_NAME` and `CRON_ARGUMENTS`, and the credentials from `FREE_MOBILE_USER` and `FREE_MOBILE_PASS`:
 
 ```sh
