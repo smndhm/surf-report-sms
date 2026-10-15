@@ -12,7 +12,7 @@
   "author": "smndhm",
   "license": "ISC",
   "dependencies": {
-    "puppeteer": "25.13.0"
+    "puppeteer": "25.14.0"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
