@@ -5,32 +5,29 @@ const puppeteer = require('puppeteer');
 // the page, in one go: only what the SMS says, so a change to anything else on
 // the page cannot break a run.
 const readDays = () =>
-  Array.from(document.querySelectorAll('.forecast-tab'), (tab) => ({
+  Array.from(document.querySelectorAll('.forecast-tab'), tab => ({
     title: tab.querySelector('.title')?.textContent.trim(),
-    hours: Array.from(
-      tab.querySelectorAll('.content > .line:not(:first-child):not(.tides)'),
-      (line) => ({
-        hour: line.querySelector('.cell.date')?.textContent.trim(),
-        stars: line.querySelectorAll('.cell.stars .fa-star').length,
-      }),
-    ),
+    hours: Array.from(tab.querySelectorAll('.content > .line:not(:first-child):not(.tides)'), line => ({
+      hour: line.querySelector('.cell.date')?.textContent.trim(),
+      stars: line.querySelectorAll('.cell.stars .fa-star').length,
+    })),
   }));
 
 // A page the scraper cannot read is an error rather than a spot without waves:
 // it is what a change in the site's markup looks like, and taking it for calm
 // seas would mean no SMS ever again, on a green run.
-const assertReadable = (days) => {
+const assertReadable = days => {
   if (days.length === 0) {
     throw new Error('No forecast on the page, has the site changed?');
   }
   // A single day may have no hour left late in the evening, never all of them
-  if (days.every((day) => day.hours.length === 0)) {
+  if (days.every(day => day.hours.length === 0)) {
     throw new Error('No hour in the forecast, has the site changed?');
   }
-  if (days.some((day) => !day.title)) {
+  if (days.some(day => !day.title)) {
     throw new Error('A day of the forecast has no title, has the site changed?');
   }
-  if (days.some((day) => day.hours.some((hour) => !hour.hour))) {
+  if (days.some(day => day.hours.some(hour => !hour.hour))) {
     throw new Error('An hour of the forecast has no time, has the site changed?');
   }
 };
@@ -45,9 +42,7 @@ const readSpot = async (browser, url, minStars) => {
     return {
       url,
       title: await page.title(),
-      days: days
-        .map((day) => ({ ...day, hours: day.hours.filter((hour) => hour.stars >= minStars) }))
-        .filter((day) => day.hours.length > 0),
+      days: days.map(day => ({ ...day, hours: day.hours.filter(hour => hour.stars >= minStars) })).filter(day => day.hours.length > 0),
     };
   } finally {
     await page.close();

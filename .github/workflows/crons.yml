@@ -29,7 +29,6 @@ jobs:
       - name: Let Chrome sandbox itself
         run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
 
-
       # The credentials stay out of the install step, which runs third party code
       - name: Run cron
         run: pnpm run cron:once

@@ -8,20 +8,15 @@ const SECRETS = ['FREE_MOBILE_USER', 'FREE_MOBILE_PASS'];
 // The scraper only knows the pages of this site
 const SPOT_URL = /^https:\/\/www\.surf-report\.com\/\S+$/;
 
-const isRecord = (value) =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
+const isRecord = value => typeof value === 'object' && value !== null && !Array.isArray(value);
 
 // Validates the arguments a workflow hands over
-const parseArguments = (cronArguments) => {
+const parseArguments = cronArguments => {
   if (!isRecord(cronArguments)) {
     throw new Error(`${CRON_ARGUMENTS_ENV}: needs an object with "spots" and "minStars".`);
   }
   const { spots, minStars } = cronArguments;
-  if (
-    !Array.isArray(spots) ||
-    spots.length === 0 ||
-    !spots.every((spot) => typeof spot === 'string' && SPOT_URL.test(spot))
-  ) {
+  if (!Array.isArray(spots) || spots.length === 0 || !spots.every(spot => typeof spot === 'string' && SPOT_URL.test(spot))) {
     throw new Error(`${CRON_ARGUMENTS_ENV}: "spots" needs an array of at least one https://www.surf-report.com/ page.`);
   }
   if (!Number.isInteger(minStars) || minStars < 0 || minStars > 5) {
@@ -48,7 +43,7 @@ const loadCron = (env = process.env) => {
   const { spots, minStars } = parseArguments(cronArguments);
 
   // Names the missing secret, never a value
-  const missing = SECRETS.filter((secret) => !env[secret]);
+  const missing = SECRETS.filter(secret => !env[secret]);
   if (missing.length > 0) {
     throw new Error(`Missing secret: ${missing.join(', ')}.`);
   }
