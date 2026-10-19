@@ -2,3 +2,7 @@
 # that downloads the Chrome it drives.
 allowBuilds:
   puppeteer: true
+
+# My own packages (smndhm/dev-config) can be used as soon as they are published
+minimumReleaseAgeExclude:
+  - '@dume/*'

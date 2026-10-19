@@ -32,10 +32,7 @@ const writeSummary = (summary, env) => {
 // Runs the cron the workflow defined, then returns the number of spots that
 // could not be read or sent so the caller can exit accordingly. A spot that
 // fails does not keep the others from being read and sent.
-const runOnce = async (
-  env = process.env,
-  { scrape = surfReport, send = sendSms } = {},
-) => {
+const runOnce = async (env = process.env, { scrape = surfReport, send = sendSms } = {}) => {
   const cron = loadCron(env);
   console.log(`Cron ${cron.name} started, ${cron.spots.length} spot(s), ${cron.minStars} stars or more`);
 
@@ -76,10 +73,10 @@ module.exports = { runOnce, renderSummary };
 // Entry point, `pnpm cron:once`
 if (require.main === module) {
   runOnce()
-    .then((errors) => {
+    .then(errors => {
       process.exitCode = errors > 0 ? 1 : 0;
     })
-    .catch((err) => {
+    .catch(err => {
       console.error(err);
       process.exitCode = 1;
     });

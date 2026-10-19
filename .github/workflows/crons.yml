@@ -20,22 +20,14 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - uses: pnpm/action-setup@v6
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: pnpm
+      - uses: smndhm/dev-config/.github/actions/setup@53b9676b0670cba6a8c4a396fb20e8db4d933956 # main
 
       # Ubuntu keeps unprivileged programs from creating the namespaces Chrome
       # sandboxes itself in. Lifting that beats running it without a sandbox.
       - name: Let Chrome sandbox itself
         run: echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns
-
-      - name: Install modules
-        run: pnpm install --frozen-lockfile
 
       # The credentials stay out of the install step, which runs third party code
       - name: Run cron

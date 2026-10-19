@@ -11,8 +11,8 @@ const STATUSES = {
 // One SMS per spot: its title, then each day and the hours worth it
 const buildMessage = ({ title, days }) => {
   let msg = `${title}\n`;
-  for (const { title, hours } of days) {
-    msg += `\n${title}\n`;
+  for (const { title: day, hours } of days) {
+    msg += `\n${day}\n`;
     for (const { hour, stars } of hours) {
       msg += `${hour} ${'⭐'.repeat(stars)}\n`;
     }
