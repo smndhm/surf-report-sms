@@ -1,8 +1,11 @@
-# pnpm 12 only runs the install scripts it is allowed to. puppeteer's is the one
-# that downloads the Chrome it drives.
+# Dependencies allowed to run their install scripts (pnpm fails on the ones not listed)
 allowBuilds:
+  # Downloads the Chrome it drives
   puppeteer: true
 
 # My own packages (smndhm/dev-config) can be used as soon as they are published
 minimumReleaseAgeExclude:
   - '@dume/*'
+
+# Exact versions when adding a dependency: a caret would let in a release nobody tested
+savePrefix: ''
