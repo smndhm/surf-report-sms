@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - uses: smndhm/dev-config/ci/setup@de6a787e031fd90f9c225374c90aed42d40c03d8 # main
+      - uses: smndhm/dev-config/ci/setup@4074f1550123768d54f0d9da6af48521026f0c47 # main
 
       # Ubuntu keeps unprivileged programs from creating the namespaces Chrome
       # sandboxes itself in. Lifting that beats running it without a sandbox.
