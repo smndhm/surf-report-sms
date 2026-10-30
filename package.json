@@ -2,7 +2,7 @@
   "name": "surf-report-sms",
   "version": "2.0.0",
   "description": "Get SMS notifications when good surf conditions are coming",
-  "packageManager": "pnpm@12.15.0",
+  "packageManager": "pnpm@12.16.0",
   "scripts": {
     "cron:once": "node ./run-once.js",
     "test": "vitest run",
