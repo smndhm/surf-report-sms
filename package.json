@@ -17,7 +17,7 @@
     "puppeteer": "25.16.0"
   },
   "devDependencies": {
-    "@dume/dev-config": "1.4.0",
+    "@dume/dev-config": "1.5.0",
     "oxlint": "1.92.0",
     "prettier": "3.9.10",
     "vitest": "5.1.0"
