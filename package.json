@@ -20,6 +20,6 @@
     "@dume/dev-config": "1.5.0",
     "oxlint": "1.95.0",
     "prettier": "3.10.1",
-    "vitest": "5.1.1"
+    "vitest": "5.1.2"
   }
 }
